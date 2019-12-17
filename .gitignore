@@ -59,3 +59,15 @@ INSTALL
 
 *.Po
 .deps/
+
+#ignore object files and .a files and .log files and .trs files
+*.o
+*.a
+*.log
+*.trs
+
+#explicitly ignoring the tests/test_bigint binary file
+tests/test_bigint
+
+
+
