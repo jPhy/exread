@@ -36,7 +36,7 @@ TEST_CASE( "operator ==,!=", "[BigInt]" ) {
 
 }
 
-TEST_CASE( "operator >=", "[BigInt]" ) {
+TEST_CASE( "comparison operators >=, <=", "[BigInt]" ) {
 
     const BigInt i1( 100);
     const BigInt i2(  99);
@@ -45,19 +45,57 @@ TEST_CASE( "operator >=", "[BigInt]" ) {
 
     // + >= +
     REQUIRE(i1 >= i2);
+    
+    // + <= +
+    REQUIRE(i2 <= i2);
 
     // + >= -
     REQUIRE(i1 >= i3);
     REQUIRE(i1 >= i4);
     REQUIRE(i2 >= i3);
     REQUIRE(i2 >= i4);
+    
+    // + <= -
+    REQUIRE(i3 <= i1);
+    REQUIRE(i4 <= i1);
+    REQUIRE(i3 <= i2);
+    REQUIRE(i4 <= i2);
 
     // - >= -
     REQUIRE(i4 >= i3);
 
+    // - <= -
+    REQUIRE(i3 <= i2);
+    
     // not - >= +
     REQUIRE( !(i3 >= i2) );
+    
+    // not - <= +
+    REQUIRE( !(i1 <= i4) );
+}
 
+TEST_CASE( "comparison operators >, <", "[BigInt]" ) {
+
+    const BigInt i1(   3);
+    const BigInt i2( 111);
+    const BigInt i3(- 22);
+    const BigInt i4(-999);
+    
+    // + >,< +
+    REQUIRE(i2 > i1);
+    REQUIRE(i1 < i2);
+    
+    // - >,< -
+    REQUIRE(i3 > i4);
+    REQUIRE(i4 < i3);
+    
+    // + < - and - < +
+    REQUIRE(i2 > i3);
+    REQUIRE(i4 < i1);
+    
+    // not + < - and not - > +
+    REQUIRE( !(i1 < i3) );
+    REQUIRE( !(i3 > i2) );
 }
 
 TEST_CASE( "unary arithmetic operators", "[BigInt]" ) {

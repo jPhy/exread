@@ -5,7 +5,7 @@ namespace exread {
     /*
      *  operator==
      */
-    bool BigInt::operator== (const BigInt other) const
+    bool BigInt::operator== (const BigInt& other) const
     {
         if (neg != other.neg)
             return false;
@@ -25,7 +25,7 @@ namespace exread {
     /*
      *  operator>=
      */
-    bool BigInt::operator>= (const BigInt other) const
+    bool BigInt::operator>= (const BigInt& other) const
     {
         if ( neg && (!other.neg) )
             return false;
