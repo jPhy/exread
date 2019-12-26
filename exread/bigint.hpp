@@ -18,7 +18,8 @@ namespace exread {
             static constexpr int base_radix = std::numeric_limits<base_int>::radix;
             static constexpr int base_digits = std::numeric_limits<base_int>::digits;
             static constexpr int half_base_digits = base_digits / 2;
-            static_assert(half_base_digits > 0, "BigInt must have an integral type with at least digits as base_int.");
+            static constexpr base_int leading_mask = (1 << half_base_digits) - 1;
+            static_assert(half_base_digits > 0, "BigInt must have an integral type with at least 2 digits as base_int.");
 
             bool neg; // sign bit
             std::vector<base_int> digits;
@@ -50,7 +51,7 @@ namespace exread {
                 while (n > 0)
                 {
                     digits.push_back(
-                                         (base_int(n) << half_base_digits) >> half_base_digits // strip leading digits
+                                         base_int(n) & leading_mask // strip leading digits
                                     );
                     n >>= half_base_digits; // remove lower digits of 'n' (which have just been added to 'digits')
                 };

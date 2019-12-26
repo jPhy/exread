@@ -70,7 +70,7 @@ namespace exread {
      *  binary arithmetic operators
      */
     // helper function add
-    template<int half_base_digits, typename base_int>
+    template<int half_base_digits, typename base_int, base_int leading_mask>
     static std::vector<base_int> add(const std::vector<base_int>& n1, const std::vector<base_int>& n2)
     {
         assert(n1.size() >= n2.size());
@@ -81,7 +81,7 @@ namespace exread {
         for (idx = 0; idx < n2.size(); ++idx)
         {
             overflow = result[idx] + n2[idx] + overflow;
-            result[idx] = (overflow << half_base_digits) >> half_base_digits; // remove high digits
+            result[idx] = overflow & leading_mask; // remove high digits
             overflow >>= half_base_digits; // remove low digits
         }
 
@@ -95,7 +95,7 @@ namespace exread {
                 for ( ; idx < n1.size(); ++idx)
                 {
                     overflow += result[idx];
-                    result[idx] = (overflow << half_base_digits) >> half_base_digits; // remove high digits
+                    result[idx] = overflow & leading_mask; // remove high digits
                     overflow >>= half_base_digits; // remove low digits
                     if (overflow == 0)
                         break;
@@ -109,7 +109,7 @@ namespace exread {
         return result;
     }
     // helper function subtract
-    template<int half_base_digits, typename base_int>
+    template<int half_base_digits, typename base_int, base_int leading_mask>
     static std::vector<base_int> subtract(const std::vector<base_int>& n1, const std::vector<base_int>& n2)
     {
         assert(n1.size() >= n2.size());
@@ -166,21 +166,21 @@ namespace exread {
         if (n1.neg == n2.neg)
         {
             if (n1.digits.size() >= n2.digits.size())
-                return {n1.neg, add<BigInt::half_base_digits>(n1.digits, n2.digits)};
+                return {n1.neg, add<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n1.digits, n2.digits)};
             else
-                return {n1.neg, add<BigInt::half_base_digits>(n2.digits, n1.digits)};
+                return {n1.neg, add<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n2.digits, n1.digits)};
         } else {
             if (n1.neg)
             {
                 if (-n1 >= n2)
-                    return {true, subtract<BigInt::half_base_digits>(n1.digits, n2.digits)};
+                    return {true, subtract<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n1.digits, n2.digits)};
                 else
-                    return {false, subtract<BigInt::half_base_digits>(n2.digits, n1.digits)};
+                    return {false, subtract<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n2.digits, n1.digits)};
             } else {
                 if (n1 >= -n2)
-                    return {false, subtract<BigInt::half_base_digits>(n1.digits, n2.digits)};
+                    return {false, subtract<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n1.digits, n2.digits)};
                 else
-                    return {true, subtract<BigInt::half_base_digits>(n2.digits, n1.digits)};
+                    return {true, subtract<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(n2.digits, n1.digits)};
             }
         };
     }
