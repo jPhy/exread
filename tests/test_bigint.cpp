@@ -137,4 +137,34 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
 
 }
 
+TEST_CASE( "string constructor", "[BigInt]" ) {
+
+    SECTION( "invalid argument" ) {
+
+        REQUIRE_THROWS_AS(BigInt("453714181759441XX7305560"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(BigInt("453714181759441XX7305560"), "BigInt(\"453714181759441XX7305560\")");
+
+        REQUIRE_THROWS_AS(BigInt("45371418175944173+05560"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(BigInt("45371418175944173+05560"), "BigInt(\"45371418175944173+05560\")");
+
+    }
+
+    SECTION( "positive" ) {
+
+        const BigInt i1("4537141817592417305560");
+        const BigInt i2 = BigInt(45371418175)*100000000000 + 92417305560;
+
+        REQUIRE( i1 == i2 );
+
+    }
+
+    SECTION( "negative" ) {
+
+        const BigInt i1("-4537141817592417305560");
+        const BigInt i2 = -BigInt(45371418175)*100000000000 - 92417305560;
+
+        REQUIRE( i1 == i2 );
+
+    }
+
 }

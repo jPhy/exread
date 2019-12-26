@@ -2,6 +2,7 @@
 #include <cassert> // assert
 #include <cstdio> // std::size_t
 #include <limits> // std::numeric_limits
+#include <stdexcept> // std::invalid_argument
 #include <type_traits> // std::enable_if
 #include <utility> // std::move
 #include <vector> // std::vector
@@ -56,6 +57,23 @@ namespace exread {
                     n >>= half_base_digits; // remove lower digits of 'n' (which have just been added to 'digits')
                 };
 
+            };
+
+            // from string
+            BigInt(const std::string& n) : neg(n.size()>0 ? n[0] == '-' : false)
+            {
+                BigInt res, base10 = 1;
+
+                for (auto digit = n.crbegin(); digit != (neg ? n.crend()-1 : n.crend()); ++digit)
+                {
+                    char tmp = *digit - 48;
+                    if (tmp < 0 || tmp > 9)
+                        throw std::invalid_argument("BigInt(\"" + n + "\")");
+                    res = res + tmp * base10;
+                    base10 = base10 * 10;
+                }
+
+                this->digits = std::move(res.digits);
             };
 
         /*
