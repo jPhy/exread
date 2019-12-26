@@ -189,4 +189,31 @@ namespace exread {
         return n1 + (-n2);
     }
 
+    BigInt operator* (const BigInt& n1, const BigInt& n2)
+    {
+        using base_int = BigInt::base_int;
+        std::vector<base_int> res_digits;
+
+        for (size_t idx1 = 0; idx1 < n1.digits.size(); ++idx1)
+            for (size_t idx2 = 0; idx2 < n2.digits.size(); ++idx2)
+            {
+                base_int tmp = n1.digits[idx1] * n2.digits[idx2];
+                std::vector<base_int> tmp_digits(idx1+idx2+2);
+
+                *(tmp_digits.end()-2) = tmp&BigInt::leading_mask;
+                tmp >>= BigInt::half_base_digits;
+                if (tmp == 0)
+                    tmp_digits.pop_back();
+                else
+                    tmp_digits.back() = tmp;
+
+                if (res_digits.size() >= tmp_digits.size())
+                    res_digits = add<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(res_digits, tmp_digits);
+                else
+                    res_digits = add<BigInt::half_base_digits,BigInt::base_int,BigInt::leading_mask>(tmp_digits, res_digits);
+            }
+
+        return {n1.neg^n2.neg, std::move(res_digits)};
+    }
+
 }

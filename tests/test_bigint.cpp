@@ -98,6 +98,8 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
     const long long int n6 = 69232346343090216;
     const BigInt i6(n6);
 
+    const BigInt i7 = BigInt(45371418175)*100000000000 + 94417305560;
+
     SECTION( "operator +") {
         REQUIRE( i1 + i2 == i3 );
         REQUIRE( i2 + i1 == i3 );
@@ -120,5 +122,19 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
         REQUIRE(-i5 + i3 ==  i6 );
         REQUIRE(-i3 + i5 == -i6 );
     }
+
+    SECTION( "operator *") {
+        REQUIRE(   i5  *   i6  ==  i7 );
+        REQUIRE(   i6  *   i5  ==  i7 );
+        REQUIRE( (-i6) *   i5  == -i7 );
+        REQUIRE(   i6  * (-i5) == -i7 );
+        REQUIRE( (-i6) * (-i5) ==  i7 );
+
+        REQUIRE(   BigInt(0) * i7        == 0 );
+        REQUIRE(   i7        * BigInt(0) == 0 );
+        REQUIRE( (-i7)       * BigInt(0) == 0 );
+    }
+
+}
 
 }

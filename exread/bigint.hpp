@@ -76,6 +76,7 @@ namespace exread {
          */
         friend BigInt operator+ (const BigInt& n1, const BigInt& n2);
         friend BigInt operator- (const BigInt& n1, const BigInt& n2);
+        friend BigInt operator* (const BigInt& n1, const BigInt& n2);
 
     };
 
