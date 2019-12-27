@@ -2,6 +2,7 @@
 #include <cassert> // assert
 #include <cstdio> // std::size_t
 #include <limits> // std::numeric_limits
+#include <stdexcept> // std::invalid_argument
 #include <type_traits> // std::enable_if
 #include <utility> // std::move
 #include <vector> // std::vector
@@ -18,7 +19,8 @@ namespace exread {
             static constexpr int base_radix = std::numeric_limits<base_int>::radix;
             static constexpr int base_digits = std::numeric_limits<base_int>::digits;
             static constexpr int half_base_digits = base_digits / 2;
-            static_assert(half_base_digits > 0, "BigInt must have an integral type with at least digits as base_int.");
+            static constexpr base_int leading_mask = (1 << half_base_digits) - 1;
+            static_assert(half_base_digits > 0, "BigInt must have an integral type with at least 2 digits as base_int.");
 
             bool neg; // sign bit
             std::vector<base_int> digits;
@@ -50,11 +52,28 @@ namespace exread {
                 while (n > 0)
                 {
                     digits.push_back(
-                                         (base_int(n) << half_base_digits) >> half_base_digits // strip leading digits
+                                         base_int(n) & leading_mask // strip leading digits
                                     );
                     n >>= half_base_digits; // remove lower digits of 'n' (which have just been added to 'digits')
                 };
 
+            };
+
+            // from string
+            BigInt(const std::string& n) : neg(n.size()>0 ? n[0] == '-' : false)
+            {
+                BigInt res, base10 = 1;
+
+                for (auto digit = n.crbegin(); digit != (neg ? n.crend()-1 : n.crend()); ++digit)
+                {
+                    char tmp = *digit - 48;
+                    if (tmp < 0 || tmp > 9)
+                        throw std::invalid_argument("BigInt(\"" + n + "\")");
+                    res = res + tmp * base10;
+                    base10 = base10 * 10;
+                }
+
+                this->digits = std::move(res.digits);
             };
 
         /*
@@ -79,6 +98,7 @@ namespace exread {
          */
         friend BigInt operator+ (const BigInt& n1, const BigInt& n2);
         friend BigInt operator- (const BigInt& n1, const BigInt& n2);
+        friend BigInt operator* (const BigInt& n1, const BigInt& n2);
 
     };
 

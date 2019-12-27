@@ -136,6 +136,8 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
     const long long int n6 = 69232346343090216;
     const BigInt i6(n6);
 
+    const BigInt i7 = BigInt(45371418175)*100000000000 + 94417305560;
+
     SECTION( "operator +") {
         REQUIRE( i1 + i2 == i3 );
         REQUIRE( i2 + i1 == i3 );
@@ -157,6 +159,50 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
         REQUIRE( i6 - i3 == -i5 );
         REQUIRE(-i5 + i3 ==  i6 );
         REQUIRE(-i3 + i5 == -i6 );
+    }
+
+    SECTION( "operator *") {
+        REQUIRE(   i5  *   i6  ==  i7 );
+        REQUIRE(   i6  *   i5  ==  i7 );
+        REQUIRE( (-i6) *   i5  == -i7 );
+        REQUIRE(   i6  * (-i5) == -i7 );
+        REQUIRE( (-i6) * (-i5) ==  i7 );
+
+        REQUIRE(   BigInt(0) * i7        == 0 );
+        REQUIRE(   i7        * BigInt(0) == 0 );
+        REQUIRE( (-i7)       * BigInt(0) == 0 );
+    }
+
+}
+
+TEST_CASE( "string constructor", "[BigInt]" ) {
+
+    SECTION( "invalid argument" ) {
+
+        REQUIRE_THROWS_AS(BigInt("453714181759441XX7305560"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(BigInt("453714181759441XX7305560"), "BigInt(\"453714181759441XX7305560\")");
+
+        REQUIRE_THROWS_AS(BigInt("45371418175944173+05560"), std::invalid_argument);
+        REQUIRE_THROWS_WITH(BigInt("45371418175944173+05560"), "BigInt(\"45371418175944173+05560\")");
+
+    }
+
+    SECTION( "positive" ) {
+
+        const BigInt i1("4537141817592417305560");
+        const BigInt i2 = BigInt(45371418175)*100000000000 + 92417305560;
+
+        REQUIRE( i1 == i2 );
+
+    }
+
+    SECTION( "negative" ) {
+
+        const BigInt i1("-4537141817592417305560");
+        const BigInt i2 = -BigInt(45371418175)*100000000000 - 92417305560;
+
+        REQUIRE( i1 == i2 );
+
     }
 
 }
