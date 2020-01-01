@@ -85,7 +85,7 @@ namespace exread {
         bool operator<  (const BigInt& other) const { return !(*this >= other); }
         bool operator<= (const BigInt& other) const { return  ( other >= *this); }
         bool operator>  (const BigInt& other) const { return !(*this <= other); }
-        
+
 
         /*
          *  unary arithmetic operators
