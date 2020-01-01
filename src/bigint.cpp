@@ -216,4 +216,70 @@ namespace exread {
         return {n1.neg^n2.neg, std::move(res_digits)};
     }
 
+    BigInt operator/ (const BigInt& n1, const BigInt& n2)
+    {
+
+        using base_int = BigInt::base_int;
+
+        // handle division by zero
+        if (n2.digits.size() == 0)
+            throw std::invalid_argument("Division by BigInt(0)");
+
+        // handle sign
+        if (n1.neg)
+        {
+            if (n2.neg)
+                return (-n1) / (-n2);
+            else
+                return -( (-n1)/n2 );
+        } else if (n2.neg) {
+            return -( n1/(-n2) );
+        }
+
+        // handle zero result
+        if (  (n2 > n1) || (n1.digits.size() == 0)  )
+            return 0;
+
+        assert(n1.digits.size() >= n2.digits.size());
+        assert(n1.digits.size() >= 1);
+
+        // division as with base_int
+        if (n1.digits.size() == 1)
+        {
+            assert(n2.digits.size() == 1);
+            return n1.digits[0] / n2.digits[0];
+
+
+        // division with multiple digits
+        } else {
+
+            assert(n1.digits.size() >= 2);
+
+            // compute a lower bound as "<hightes two digits of n1> / (<hightes digit of n2> + 1)"
+            const base_int tmp_num = (n1.digits.back() << BigInt::half_base_digits) | *(n1.digits.end()-2);
+            const base_int tmp_den = n2.digits.back() + 1;
+            const base_int tmp_res = (tmp_num / tmp_den);
+
+            // correct shift introduced by only considering the leading digits in "tmp_res"
+            const size_t number_of_leading_zeros_plus_one = n1.digits.size() - n2.digits.size() + 1;
+            std::vector<base_int> lower_bound_for_res_digits(number_of_leading_zeros_plus_one);
+            lower_bound_for_res_digits.back() = tmp_res >> BigInt::half_base_digits;
+            if (lower_bound_for_res_digits.size() > 1)
+                *(lower_bound_for_res_digits.end()-2) = tmp_res & BigInt::leading_mask;
+
+            // remove leading zeros
+            while (lower_bound_for_res_digits.size() > 0 && lower_bound_for_res_digits.back() == 0)
+                lower_bound_for_res_digits.pop_back();
+
+            // The division result is definitely larger than zero since we catch that case right away in "if (n2 > n1)".
+            if (lower_bound_for_res_digits.empty())
+                lower_bound_for_res_digits.push_back(1);
+
+            const BigInt lower_bound_for_res(false,std::move(lower_bound_for_res_digits));
+            return lower_bound_for_res + (n1-n2*lower_bound_for_res) / n2;
+
+        }
+
+    }
+
 }

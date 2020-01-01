@@ -173,6 +173,32 @@ TEST_CASE( "binary arithmetic operators", "[BigInt]" ) {
         REQUIRE( (-i7)       * BigInt(0) == 0 );
     }
 
+    SECTION( "operator /") {
+        REQUIRE( i2 / i1 == 0 );
+
+        REQUIRE( BigInt(124365) / BigInt(100000) == 1 );
+        REQUIRE( BigInt(634) / BigInt(10) == 63 );
+
+        REQUIRE( ( i1) / ( i2) ==  85225300017 );
+        REQUIRE( (-i1) / ( i2) == -85225300017 );
+        REQUIRE( (-i1) / (-i2) ==  85225300017 );
+        REQUIRE( ( i1) / (-i2) == -85225300017 );
+
+        REQUIRE( ( i6 * i5) /   i6  ==  i5 );
+        REQUIRE( (-i6 * i5) /   i6  == -i5 );
+        REQUIRE( ( i6 * i5) / (-i6) == -i5 );
+        REQUIRE( (-i6 * i5) / (-i6) ==  i5 );
+
+        REQUIRE( (i6 * i5 + (i6-1)) / i6  ==  i5 );
+        REQUIRE( (i6 * i5 +  i6   ) / i6  ==  i5 + 1 );
+        REQUIRE( (i6 * i5 +  94   ) / i6  ==  i5 );
+
+        REQUIRE_THROWS_AS(1 / BigInt(0), std::invalid_argument);
+        REQUIRE_THROWS_WITH(1 / BigInt(0), "Division by BigInt(0)");
+        REQUIRE_THROWS_AS(BigInt(23) / BigInt(0), std::invalid_argument);
+        REQUIRE_THROWS_WITH(BigInt(23) / BigInt(0), "Division by BigInt(0)");
+    }
+
 }
 
 TEST_CASE( "string constructor", "[BigInt]" ) {
